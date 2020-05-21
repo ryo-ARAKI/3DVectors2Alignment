@@ -234,6 +234,12 @@ module PlotFigures
             cmap="plasma",
             clip=clip_range
         )
+        joint_plot = joint_plot.plot_joint(
+            sns.scatterplot,
+            marker="+",
+            color="black",
+            linewidth=2
+        )
 
         # Plot attribution
         if file_prefix[1] == "polar"
@@ -253,6 +259,8 @@ module PlotFigures
             joint_plot.ax_joint.set_xlim([-1.1, 1.1])
             joint_plot.ax_joint.set_xticks([-1.0, -0.5, 0.0, 0.5, 1.0])
         end
+        joint_plot.ax_joint.set_ylim([-1.1, 1.1])
+        joint_plot.ax_joint.set_yticks([-1.0, -0.5, 0.0, 0.5, 1.0])
         joint_plot.ax_marg_x.set_axis_off()
         joint_plot.ax_marg_y.set_axis_off()
 
@@ -289,7 +297,7 @@ using .PlotFigures:
 ## Declare parameters & mutable structs
 # ----------------------------------------
 x_lim = 1.0
-num_vectors = 10
+num_vectors = 500
 param = ParamVar.Parameters(
     x_lim, num_vectors
 )
@@ -313,7 +321,7 @@ distribute_points(param, vectors)
 # ----------------------------------------
 distribute_angles(param, vectors)
 
-plot_3d_vectors(param, vectors)
+# plot_3d_vectors(param, vectors)
 
 
 # ----------------------------------------
