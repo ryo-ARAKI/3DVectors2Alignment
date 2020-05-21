@@ -45,10 +45,22 @@ end
 Module for defining origin & components of vectors
 """
 module DefineVectors
+    using Distributions
+
     """
     Define 3d random points (origin of vectors)
     """
     function distribute_points(param, vectors)
+        for itr_vec in 1:param.num_vectors
+            vectors[itr_vec].x = rand(Uniform(-param.x_lim, param.x_lim))
+            vectors[itr_vec].y = rand(Uniform(-param.x_lim, param.x_lim))
+            vectors[itr_vec].z = rand(Uniform(-param.x_lim, param.x_lim))
+        end
+
+        #=
+        x = getfield.(vectors, :x)
+        println(x)
+        =#
 
     end
 
