@@ -213,32 +213,22 @@ module PlotFigures
         ax = gca(
             ylim=[-1.1, 1.1], yticks=[-1.0, -0.5, 0.0, 0.5, 1.0]
         )
-        if file_prefix == "polar_phi_costheta"  # x:ϕ y:cosθ
+        if file_prefix[1] == "polar"
+            ax.set_title("Alignment in 3D polar coordinates")
+        elseif file_prefix[1] == "cylindrical"
+            ax.set_title("Alignment in 3D cylindrical coordinates")
+        end
+        if file_prefix[2] == "phi_costheta"  # x:ϕ y:cosθ
             ax.set_xlabel(L"$\phi$")
             ax.set_ylabel(L"$\cos \theta$")
             ax.set_xlim([-0.1, π+0.1])
             ax.set_xticks([0.0, π/4.0, π/2.0, π*3.0/4.0, π])
             ax.set_xticklabels([L"$0$", L"$\pi/4$", L"$\pi/2$", L"$3\pi/4$", L"$\pi$"])
-            ax.set_title("Alignment in 3D polar coordinates")
-        elseif file_prefix == "polar_cosphi_costheta"  # x:cosϕ y:cosθ
+        elseif file_prefix[2] == "cosphi_costheta"  # x:cosϕ y:cosθ
             ax.set_xlabel(L"$\cos \phi$")
             ax.set_ylabel(L"$\cos \theta$")
             ax.set_xlim([-1.1, 1.1])
             ax.set_xticks([-1.0, -0.5, 0.0, 0.5, 1.0])
-            ax.set_title("Alignment in 3D polar coordinates")
-        elseif file_prefix == "cylindrical_phi_costheta"  # x:cosϕ y:cosθ
-            ax.set_xlabel(L"$\phi$")
-            ax.set_ylabel(L"$\cos \theta$")
-            ax.set_xlim([-0.1, π+0.1])
-            ax.set_xticks([0.0, π/4.0, π/2.0, π*3.0/4.0, π])
-            ax.set_xticklabels([L"$0$", L"$\pi/4$", L"$\pi/2$", L"$3\pi/4$", L"$\pi$"])
-            ax.set_title("Alignment in 3D cylindrical coordinates")
-        elseif file_prefix == "cylindrical_cosphi_costheta"  # x:cosϕ y:cosθ
-            ax.set_xlabel(L"$\cos \phi$")
-            ax.set_ylabel(L"$\cos \theta$")
-            ax.set_xlim([-1.1, 1.1])
-            ax.set_xticks([-1.0, -0.5, 0.0, 0.5, 1.0])
-            ax.set_title("Alignment in 3D cylindrical coordinates")
         end
 
         ax.scatter(
@@ -247,7 +237,7 @@ module PlotFigures
             alpha=0.8
         )
 
-        savefig(string("./tmp/", file_prefix, ".png"), bbox_inches="tight", pad_inches=0.1)
+        savefig(string("./tmp/", file_prefix[1], "_", file_prefix[2], ".png"), bbox_inches="tight", pad_inches=0.1)
     end
 end
 
@@ -324,14 +314,14 @@ plot_alignment(
     param,
     getfield.(aligns_polar, :ϕ),
     getfield.(aligns_polar, :cosθ),
-    "polar_phi_costheta"
+    ["polar", "phi_costheta"]
 )
 
 plot_alignment(
     param,
     getfield.(aligns_polar, :cosϕ),
     getfield.(aligns_polar, :cosθ),
-    "polar_cosphi_costheta"
+    ["polar", "cosphi_costheta"]
 )
 
 # ----------------------------------------
@@ -350,12 +340,12 @@ plot_alignment(
     param,
     getfield.(aligns_polar, :ϕ),
     getfield.(aligns_polar, :cosθ),
-    "cylindrical_phi_costheta"
+    ["cylindrical", "phi_costheta"]
 )
 
 plot_alignment(
     param,
     getfield.(aligns_polar, :cosϕ),
     getfield.(aligns_polar, :cosθ),
-    "cylindrical_cosphi_costheta"
+    ["cylindrical", "cosphi_costheta"]
 )
