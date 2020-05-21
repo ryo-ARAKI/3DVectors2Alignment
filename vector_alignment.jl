@@ -78,7 +78,7 @@ module DefineVectors
     """
     Define vectors in uniform random direction
     """
-    function distribute_angles(param, vectors)
+    function distribute_random_angles(param, vectors)
         θ = rand(Uniform(0.0, π), param.num_vectors)  # 0≤θ≤π
         ϕ = rand(Uniform(0.0, 2.0*π), param.num_vectors)  # 0≤ϕ≤2π
 
@@ -94,6 +94,31 @@ module DefineVectors
         println(vx)
         =#
 
+    end
+
+    """
+    Define vectors in swirling (in xy plane) direction
+    """
+    function distribute_swirling_angles(param, vectors)
+        θ = rand(Uniform(π/2-0.05*π/2, π/2+0.05*π/2), param.num_vectors)  # 0≤θ≤π
+
+        for itr_vec in 1:param.num_vectors
+            x = vectors[itr_vec].x
+            y = vectors[itr_vec].y
+
+            # ψ: angle between vector origin on xy plane & coordinate origin
+            cosψ = x / sqrt(x^2 + y^2)
+            sinψ = y / sqrt(x^2 + y^2)
+
+            # vr: vector in r direction (perpendicular to ψ)
+            # vψ: vector in ψ direction (perpendicular to r)
+            vr = 0.0
+            vψ = 0.5 * sqrt(x^2 + y^2)
+
+            vectors[itr_vec].vx = cosψ * vr - sinψ * vψ
+            vectors[itr_vec].vy = sinψ * vr + cosψ * vψ
+            vectors[itr_vec].vz = cos(θ[itr_vec])
+        end
     end
 end
 
@@ -152,6 +177,9 @@ module ComputeAlignments
             # ϕ: angle between vector projected onto xy plane & ψ vector
             vϕ = -sinψ * vx + cosψ * vy
             cosϕ = vϕ / sqrt(vx^2 + vy^2)
+            if 1.0<cosϕ<1.001  # Handle error with swirling flow
+                cosϕ = 1.0
+            end
             ϕ = acos(cosϕ)
 
             aligns[itr_vec].cosθ = cosθ
@@ -285,7 +313,8 @@ using Plots
 using .ParamVar
 using .DefineVectors:
     distribute_points,
-    distribute_angles
+    distribute_random_angles,
+    distribute_swirling_angles
 using .ComputeAlignments:
     compute_alignment_polar,
     compute_alignment_cylindrical
@@ -320,7 +349,8 @@ distribute_points(param, vectors)
 # ----------------------------------------
 ## Define vectors in uniform random direction
 # ----------------------------------------
-distribute_angles(param, vectors)
+# distribute_random_angles(param, vectors)
+distribute_swirling_angles(param, vectors)
 
 plot_3d_vectors(param, vectors)
 
