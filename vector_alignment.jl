@@ -92,7 +92,7 @@ Module for computing alignments
 """
 module ComputeAlignments
     """
-    Compute PDF of vector alignment in 3D polar coordinates
+    Compute vector alignment in 3D polar coordinates
     """
     function compute_alignment_polar(param, vectors, aligns)
 
@@ -103,8 +103,8 @@ module ComputeAlignments
 
             # θ: angle between vector & z axis
             # ϕ: angle between vector projected onto xy plane & x axis
-            cosθ = vz / sqrt(vx^2+vy^2+vz^2)
-            cosϕ = vx / sqrt(vx^2+vy^2)
+            cosθ = vz / sqrt(vx^2 + vy^2 + vz^2)
+            cosϕ = vx / sqrt(vx^2 + vy^2)
             ϕ = acos(cosϕ)
 
             aligns[itr_vec].cosθ = cosθ
@@ -230,16 +230,17 @@ param = ParamVar.Parameters(
     x_lim, num_vectors
 )
 
+
+# ----------------------------------------
+## Define 3d random points (origin of vectors)
+# ----------------------------------------
+
 # Define mutable struct for vectors
 vectors = Array{ParamVar.Vector}(undef, param.num_vectors)
 for itr_vec = 1:param.num_vectors
     vectors[itr_vec] = ParamVar.Vector()
 end
 
-
-# ----------------------------------------
-## Define 3d random points (origin of vectors)
-# ----------------------------------------
 distribute_points(param, vectors)
 
 
@@ -250,24 +251,27 @@ distribute_angles(param, vectors)
 
 plot_3d_vectors(param, vectors)
 
+
+# ----------------------------------------
+## Compute vector alignment in 3D polar coordinates
+## Output its PDF
+# ----------------------------------------
+
 # Define mutable structs for alignments
 aligns_polar = Array{ParamVar.Alignment_Polar}(undef, param.num_vectors)
 for itr_vec = 1:param.num_vectors
     aligns_polar[itr_vec] = ParamVar.Alignment_Polar()
 end
 
-
-# ----------------------------------------
-## Compute vector alignment in 3D polar coordinates
-## Output its PDF
-# ----------------------------------------
 compute_alignment_polar(param, vectors, aligns_polar)
+
 plot_alignment(
     param,
     getfield.(aligns_polar, :ϕ),
     getfield.(aligns_polar, :cosθ),
     "polar_phi_costheta"
 )
+
 plot_alignment(
     param,
     getfield.(aligns_polar, :cosϕ),
