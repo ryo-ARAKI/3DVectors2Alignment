@@ -169,14 +169,21 @@ module PlotFigures
         pygui(true)
         fig = figure()
         ax = gca(
-            ylim=[-1.0, 1.0], yticks=[-1.0, -0.5, 0.0, 0.5, 1.0]
+            ylim=[-1.1, 1.1], yticks=[-1.0, -0.5, 0.0, 0.5, 1.0]
         )
-        if file_prefix == "polar_phi_costheta"
+        if file_prefix == "polar_phi_costheta"  # x:ϕ y:cosθ
             ax.set_xlabel(L"$\phi$")
             ax.set_ylabel(L"$\cos \theta$")
-            ax.set_xlim([0.0, π])
+            ax.set_xlim([-0.1, π+0.1])
             ax.set_xticks([0.0, π/4.0, π/2.0, π*3.0/4.0, π])
             ax.set_xticklabels([L"$0$", L"$\pi/4$", L"$\pi/2$", L"$3\pi/4$", L"$\pi$"])
+            ax.set_title("Alignment in 3D polar coordinates")
+        elseif file_prefix == "polar_cosphi_costheta"  # x:cosϕ y:cosθ
+            ax.set_xlabel(L"$\cos \phi$")
+            ax.set_ylabel(L"$\cos \theta$")
+            ax.set_xlim([-1.1, 1.1])
+            ax.set_xticks([-1.0, -0.5, 0.0, 0.5, 1.0])
+            ax.set_title("Alignment in 3D polar coordinates")
         end
 
         ax.scatter(
@@ -260,6 +267,12 @@ plot_alignment(
     getfield.(aligns_polar, :ϕ),
     getfield.(aligns_polar, :cosθ),
     "polar_phi_costheta"
+)
+plot_alignment(
+    param,
+    getfield.(aligns_polar, :cosϕ),
+    getfield.(aligns_polar, :cosθ),
+    "polar_cosphi_costheta"
 )
 
 #=
