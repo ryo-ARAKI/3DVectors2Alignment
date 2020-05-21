@@ -68,6 +68,20 @@ module DefineVectors
     Define vectors in uniform random direction
     """
     function distribute_angles(param, vectors)
+        θ = rand(Uniform(0.0, π), param.num_vectors)  # 0≤θ≤π
+        ϕ = rand(Uniform(0.0, 2.0*π), param.num_vectors)  # 0≤ϕ≤2π
+
+        for itr_vec in 1:param.num_vectors
+            vectors[itr_vec].vx = sin(θ[itr_vec]) * cos(ϕ[itr_vec])
+            vectors[itr_vec].vy = sin(θ[itr_vec]) * sin(ϕ[itr_vec])
+            vectors[itr_vec].vz = cos(θ[itr_vec])
+        end
+
+        #=
+        println(θ)
+        vx = getfield.(vectors, :vx)
+        println(vx)
+        =#
 
     end
 end
