@@ -32,8 +32,8 @@ module ParamVar
     Alignment in terms of 3D polar coordinates
     """
     mutable struct Alignment_Polar
-        cosθ::Float64
-        ϕ::Float64
+        cosθ::Float64  # angle between vector & z axis
+        ϕ::Float64  # angle between vector projected onto xy plane & x axis
         cosϕ::Float64
         # Constructor
         Alignment_Polar() = new()
@@ -43,8 +43,8 @@ module ParamVar
     Alignment in terms of 3D cylindrical coordinates
     """
     mutable struct Alignment_Cylindrical
-        cosθ::Float64
-        ϕ::Float64
+        cosθ::Float64  # θ: angle between vector & z axis
+        ϕ::Float64  # ϕ: angle between vector projected onto xy plane & ψ vector
         cosϕ::Float64
         # Constructor
         Alignment_Cylindrical() = new()
@@ -298,7 +298,7 @@ using .PlotFigures:
 ## Declare parameters & mutable structs
 # ----------------------------------------
 x_lim = 1.0
-num_vectors = 500
+num_vectors = 100
 param = ParamVar.Parameters(
     x_lim, num_vectors
 )
@@ -322,7 +322,7 @@ distribute_points(param, vectors)
 # ----------------------------------------
 distribute_angles(param, vectors)
 
-# plot_3d_vectors(param, vectors)
+plot_3d_vectors(param, vectors)
 
 
 # ----------------------------------------
