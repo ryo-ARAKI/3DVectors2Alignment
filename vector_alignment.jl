@@ -168,11 +168,17 @@ Module for plotting
 """
 module PlotFigures
     using PyPlot
-    # Font setting
-    fs=12
-    rc("font",family ="Times New Roman",size=fs)
-    rc("font",serif ="Times New Roman",size=fs)
-    rc("text",usetex ="true")
+    using PyCall
+    sns = pyimport("seaborn")
+    sns.set(
+        context="talk",
+        style="white",
+        palette="plasma",
+        font="sans-serif",
+        font_scale=1,
+        color_codes=false,
+    )
+    rc("text", usetex ="true")
 
     """
     Plot 3D vectors
@@ -209,33 +215,46 @@ module PlotFigures
     function plot_alignment(param, dat_x, dat_y, file_prefix)
         # Figure setting
         pygui(true)
-        fig = figure()
-        ax = gca(
-            ylim=[-1.1, 1.1], yticks=[-1.0, -0.5, 0.0, 0.5, 1.0]
+        joint_plot = sns.JointGrid(
+            x=dat_x,
+            y=dat_y,
         )
-        if file_prefix[1] == "polar"
-            ax.set_title("Alignment in 3D polar coordinates")
-        elseif file_prefix[1] == "cylindrical"
-            ax.set_title("Alignment in 3D cylindrical coordinates")
-        end
+
+        # Define range of kernel density estimation
         if file_prefix[2] == "phi_costheta"  # x:ϕ y:cosθ
-            ax.set_xlabel(L"$\phi$")
-            ax.set_ylabel(L"$\cos \theta$")
-            ax.set_xlim([-0.1, π+0.1])
-            ax.set_xticks([0.0, π/4.0, π/2.0, π*3.0/4.0, π])
-            ax.set_xticklabels([L"$0$", L"$\pi/4$", L"$\pi/2$", L"$3\pi/4$", L"$\pi$"])
+            clip_range = [(0.0, π), (-1.0, 1.0)]
         elseif file_prefix[2] == "cosphi_costheta"  # x:cosϕ y:cosθ
-            ax.set_xlabel(L"$\cos \phi$")
-            ax.set_ylabel(L"$\cos \theta$")
-            ax.set_xlim([-1.1, 1.1])
-            ax.set_xticks([-1.0, -0.5, 0.0, 0.5, 1.0])
+            clip_range = [(-1.0, 1.0), (-1.0, 1.0)]
         end
 
-        ax.scatter(
-            dat_x, dat_y,
-            c="deeppink",
-            alpha=0.8
+        # Plot KDE & scatter
+        joint_plot = joint_plot.plot_joint(
+            sns.kdeplot,
+            # cbar=True,
+            cmap="plasma",
+            clip=clip_range
         )
+
+        # Plot attribution
+        if file_prefix[1] == "polar"
+            joint_plot.ax_joint.set_title("Alignment in 3D polar coordinates")
+        elseif file_prefix[1] == "cylindrical"
+            joint_plot.ax_joint.set_title("Alignment in 3D cylindrical coordinates")
+        end
+        if file_prefix[2] == "phi_costheta"  # x:ϕ y:cosθ
+            joint_plot.ax_joint.set_xlabel(L"$\phi$")
+            joint_plot.ax_joint.set_ylabel(L"$\cos \theta$")
+            joint_plot.ax_joint.set_xlim([-0.1, π+0.1])
+            joint_plot.ax_joint.set_xticks([0.0, π/4.0, π/2.0, π*3.0/4.0, π])
+            joint_plot.ax_joint.set_xticklabels([L"$0$", L"$\pi/4$", L"$\pi/2$", L"$3\pi/4$", L"$\pi$"])
+        elseif file_prefix[2] == "cosphi_costheta"  # x:cosϕ y:cosθ
+            joint_plot.ax_joint.set_xlabel(L"$\cos \phi$")
+            joint_plot.ax_joint.set_ylabel(L"$\cos \theta$")
+            joint_plot.ax_joint.set_xlim([-1.1, 1.1])
+            joint_plot.ax_joint.set_xticks([-1.0, -0.5, 0.0, 0.5, 1.0])
+        end
+        joint_plot.ax_marg_x.set_axis_off()
+        joint_plot.ax_marg_y.set_axis_off()
 
         savefig(string("./tmp/", file_prefix[1], "_", file_prefix[2], ".png"), bbox_inches="tight", pad_inches=0.1)
     end
