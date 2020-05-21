@@ -38,6 +38,17 @@ module ParamVar
         # Constructor
         Alignment_Polar() = new()
     end
+
+    """
+    Alignment in terms of 3D cylindrical coordinates
+    """
+    mutable struct Alignment_Cylindrical
+        cosθ::Float64
+        ϕ::Float64
+        cosϕ::Float64
+        # Constructor
+        Alignment_Cylindrical() = new()
+    end
 end
 
 
@@ -116,6 +127,37 @@ module ComputeAlignments
         cosθ = getfield.(aligns, :cosθ)
         println(cosθ)
         =#
+
+    end
+
+    """
+    Compute vector alignment in 3D cylindrical coordinates
+    """
+    function compute_alignment_cylindrical(param, vectors, aligns)
+
+        for itr_vec in 1:param.num_vectors
+            x = vectors[itr_vec].x
+            y = vectors[itr_vec].y
+            vx = vectors[itr_vec].vx
+            vy = vectors[itr_vec].vy
+            vz = vectors[itr_vec].vz
+
+            # θ: angle between vector & z axis
+            cosθ = vz / sqrt(vx^2 + vy^2 + vz^2)
+
+            # ψ: angle between vector origin on xy plane & coordinate origin
+            cosψ = x / sqrt(x^2 + y^2)
+            sinψ = y / sqrt(x^2 + y^2)
+
+            # ϕ: angle between vector projected onto xy plane & ψ vector
+            vϕ = -sinψ * vx + cosψ * vy
+            cosϕ = vϕ / sqrt(vx^2 + vy^2)
+            ϕ = acos(cosϕ)
+
+            aligns[itr_vec].cosθ = cosθ
+            aligns[itr_vec].cosϕ = cosϕ
+            aligns[itr_vec].ϕ = ϕ
+        end
 
     end
 end
@@ -279,9 +321,15 @@ plot_alignment(
     "polar_cosphi_costheta"
 )
 
-#=
 # ----------------------------------------
 ## Compute vector alignment in 3D cylindrical coordinates
 # ----------------------------------------
+
+# Define mutable structs for alignments
+align_cylindrical = Array{ParamVar.Alignment_Cylindrical}(undef, param.num_vectors)
+for itr_vec = 1:param.num_vectors
+    align_cylindrical[itr_vec] = ParamVar.Alignment_Cylindrical()
+end
+
 compute_alignment_polar(param, vectors, align_cylindrical)
 =#
