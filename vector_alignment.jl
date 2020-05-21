@@ -287,7 +287,8 @@ using .DefineVectors:
     distribute_points,
     distribute_angles
 using .ComputeAlignments:
-    compute_alignment_polar
+    compute_alignment_polar,
+    compute_alignment_cylindrical
 using .PlotFigures:
     plot_3d_vectors,
     plot_alignment
@@ -353,6 +354,7 @@ plot_alignment(
 
 # ----------------------------------------
 ## Compute vector alignment in 3D cylindrical coordinates
+## Output its PDF
 # ----------------------------------------
 
 # Define mutable structs for alignments
@@ -361,18 +363,18 @@ for itr_vec = 1:param.num_vectors
     align_cylindrical[itr_vec] = ParamVar.Alignment_Cylindrical()
 end
 
-compute_alignment_polar(param, vectors, align_cylindrical)
+compute_alignment_cylindrical(param, vectors, align_cylindrical)
 
 plot_alignment(
     param,
-    getfield.(aligns_polar, :ϕ),
-    getfield.(aligns_polar, :cosθ),
+    getfield.(align_cylindrical, :ϕ),
+    getfield.(align_cylindrical, :cosθ),
     ["cylindrical", "phi_costheta"]
 )
 
 plot_alignment(
     param,
-    getfield.(aligns_polar, :cosϕ),
-    getfield.(aligns_polar, :cosθ),
+    getfield.(align_cylindrical, :cosϕ),
+    getfield.(align_cylindrical, :cosθ),
     ["cylindrical", "cosphi_costheta"]
 )
