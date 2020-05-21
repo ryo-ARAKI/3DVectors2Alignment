@@ -32,9 +32,9 @@ module ParamVar
     Alignment in terms of 3D polar coordinates
     """
     mutable struct Alignment_Polar
-        cos_θ::Float64
+        cosθ::Float64
         ϕ::Float64
-        cos_ϕ::Float64
+        cosϕ::Float64
         # Constructor
         Alignment_Polar() = new()
     end
@@ -96,6 +96,27 @@ module ComputeAlignments
     """
     function compute_alignment_polar(param, vectors, aligns)
 
+        for itr_vec in 1:param.num_vectors
+            vx = vectors[itr_vec].vx
+            vy = vectors[itr_vec].vy
+            vz = vectors[itr_vec].vz
+
+            # θ: angle between vector & z axis
+            # ϕ: angle between vector projected onto xy plane & x axis
+            cosθ = vz / sqrt(vx^2+vy^2+vz^2)
+            cosϕ = vx / sqrt(vx^2+vy^2)
+            ϕ = acos(cosϕ)
+
+            aligns[itr_vec].cosθ = cosθ
+            aligns[itr_vec].cosϕ = cosϕ
+            aligns[itr_vec].ϕ = ϕ
+        end
+
+        #=
+        cosθ = getfield.(aligns, :cosθ)
+        println(cosθ)
+        =#
+
     end
 end
 
@@ -121,7 +142,7 @@ module PlotFigures
         ax = gca(
             projection="3d",
             xlabel=L"$x$", ylabel=L"$y$", zlabel=L"$z$",
-            xlim=[-1.0, 1.0], ylim=[-1.0, 1.0], zlim=[-1.0, 1.0],
+            xlim=[-param.x_lim, param.x_lim], ylim=[-param.x_lim, param.x_lim], zlim=[-param.x_lim, param.x_lim],
             xticks=[-1.0, -0.5, 0.0, 0.5, 1.0], yticks=[-1.0, -0.5, 0.0, 0.5, 1.0], zticks=[-1.0, -0.5, 0.0, 0.5, 1.0]
         )
 
@@ -199,6 +220,7 @@ aligns_polar = Array{ParamVar.Alignment_Polar}(undef, param.num_vectors)
 for itr_vec = 1:param.num_vectors
     aligns_polar[itr_vec] = ParamVar.Alignment_Polar()
 end
+
 
 # ----------------------------------------
 ## Compute PDF of vector alignment in 3D polar coordinates
