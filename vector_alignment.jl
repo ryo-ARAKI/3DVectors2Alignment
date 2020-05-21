@@ -245,12 +245,7 @@ module PlotFigures
     Plot PDF of vector alignment in polar/cylindrical coordinate
     """
     function plot_alignment(param, dat_x, dat_y, file_prefix)
-        # Figure setting
         pygui(true)
-        joint_plot = sns.JointGrid(
-            x=dat_x,
-            y=dat_y,
-        )
 
         # Define range of kernel density estimation
         if file_prefix[2] == "phi_costheta"  # x:ϕ y:cosθ
@@ -259,42 +254,49 @@ module PlotFigures
             clip_range = [(-1.0, 1.0), (-1.0, 1.0)]
         end
 
-        # Plot KDE & scatter
-        joint_plot = joint_plot.plot_joint(
-            sns.kdeplot,
+        # Plot kde & scatter
+        g = (sns.jointplot(
+            x=dat_x,
+            y=dat_y,
+            kind="kde",
             # cbar=True,
             cmap="plasma",
-            clip=clip_range
-        )
-        joint_plot = joint_plot.plot_joint(
+            clip=clip_range,
+            shade=false,
+            color="deepskyblue"
+        ).plot_joint(
             sns.scatterplot,
             marker="+",
             color="black",
             linewidth=2
-        )
+        ))
 
         # Plot attribution
         if file_prefix[1] == "polar"
-            joint_plot.ax_joint.set_title("Alignment in 3D polar coordinates")
+            g.ax_joint.text(
+                0.25, 1.05,
+                "polar"
+            )
         elseif file_prefix[1] == "cylindrical"
-            joint_plot.ax_joint.set_title("Alignment in 3D cylindrical coordinates")
+            g.ax_joint.text(
+                0.25, 1.05,
+                "cylindrical"
+            )
         end
         if file_prefix[2] == "phi_costheta"  # x:ϕ y:cosθ
-            joint_plot.ax_joint.set_xlabel(L"$\phi$")
-            joint_plot.ax_joint.set_ylabel(L"$\cos \theta$")
-            joint_plot.ax_joint.set_xlim([-0.1, π+0.1])
-            joint_plot.ax_joint.set_xticks([0.0, π/4.0, π/2.0, π*3.0/4.0, π])
-            joint_plot.ax_joint.set_xticklabels([L"$0$", L"$\pi/4$", L"$\pi/2$", L"$3\pi/4$", L"$\pi$"])
+            g.ax_joint.set_xlabel(L"$\phi$")
+            g.ax_joint.set_ylabel(L"$\cos \theta$")
+            g.ax_joint.set_xlim([-0.1, π+0.1])
+            g.ax_joint.set_xticks([0.0, π/4.0, π/2.0, π*3.0/4.0, π])
+            g.ax_joint.set_xticklabels([L"$0$", L"$\pi/4$", L"$\pi/2$", L"$3\pi/4$", L"$\pi$"])
         elseif file_prefix[2] == "cosphi_costheta"  # x:cosϕ y:cosθ
-            joint_plot.ax_joint.set_xlabel(L"$\cos \phi$")
-            joint_plot.ax_joint.set_ylabel(L"$\cos \theta$")
-            joint_plot.ax_joint.set_xlim([-1.1, 1.1])
-            joint_plot.ax_joint.set_xticks([-1.0, -0.5, 0.0, 0.5, 1.0])
+            g.ax_joint.set_xlabel(L"$\cos \phi$")
+            g.ax_joint.set_ylabel(L"$\cos \theta$")
+            g.ax_joint.set_xlim([-1.1, 1.1])
+            g.ax_joint.set_xticks([-1.0, -0.5, 0.0, 0.5, 1.0])
         end
-        joint_plot.ax_joint.set_ylim([-1.1, 1.1])
-        joint_plot.ax_joint.set_yticks([-1.0, -0.5, 0.0, 0.5, 1.0])
-        joint_plot.ax_marg_x.set_axis_off()
-        joint_plot.ax_marg_y.set_axis_off()
+        g.ax_joint.set_ylim([-1.1, 1.1])
+        g.ax_joint.set_yticks([-1.0, -0.5, 0.0, 0.5, 1.0])
 
         savefig(
             string("./tmp/", file_prefix[1], "_", file_prefix[2], param.file_postfix),
@@ -334,7 +336,7 @@ using .PlotFigures:
 ## Declare parameters & mutable structs
 # ----------------------------------------
 x_lim = 1.0
-num_vectors = 100
+num_vectors = 400
 flag_siwrling = true
 if flag_siwrling
     file_postfix = "_swirling.png"
