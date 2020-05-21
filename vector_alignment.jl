@@ -100,6 +100,48 @@ module ComputeAlignments
 end
 
 
+"""
+Module for plotting
+"""
+module PlotFigures
+    using PyPlot
+    # Font setting
+    fs=12
+    rc("font",family ="Times New Roman",size=fs)
+    rc("font",serif ="Times New Roman",size=fs)
+    rc("text",usetex ="true")
+
+    """
+    Plot 3D vectors
+    """
+    function plot_3d_vectors(param, vectors)
+        # Figure setting
+        pygui(true)
+        fig = figure()
+        ax = gca(
+            projection="3d",
+            xlabel=L"$x$", ylabel=L"$y$", zlabel=L"$z$",
+            xlim=[-1.0, 1.0], ylim=[-1.0, 1.0], zlim=[-1.0, 1.0],
+            xticks=[-1.0, -0.5, 0.0, 0.5, 1.0], yticks=[-1.0, -0.5, 0.0, 0.5, 1.0], zticks=[-1.0, -0.5, 0.0, 0.5, 1.0]
+        )
+
+        # Obtain fields from array of mutable struct
+        x = getfield.(vectors, :x)
+        y = getfield.(vectors, :y)
+        z = getfield.(vectors, :z)
+        vx = getfield.(vectors, :vx)
+        vy = getfield.(vectors, :vy)
+        vz = getfield.(vectors, :vz)
+
+        # Vector plot
+        quiver_coef = 0.2
+        ax.quiver(x,y,z, quiver_coef*vx, quiver_coef*vy, quiver_coef*vz)
+
+        savefig("./tmp/vectors.png", bbox_inches="tight", pad_inches=0.1)
+    end
+end
+
+
 
 # ========================================
 # Main function
@@ -108,10 +150,10 @@ end
 ## Declare modules
 using Printf
 using Plots
-gr(
-    markerstrokewidth = 0,
-    markersize = 10
-)
+# gr(
+#     markerstrokewidth = 0,
+#     markersize = 10
+# )
 
 using .ParamVar
 using .DefineVectors:
@@ -119,6 +161,8 @@ using .DefineVectors:
     distribute_angles
 using .ComputeAlignments:
     compute_alignment_polar
+using .PlotFigures:
+    plot_3d_vectors
 
 
 # ----------------------------------------
@@ -148,6 +192,7 @@ distribute_points(param, vectors)
 # ----------------------------------------
 distribute_angles(param, vectors)
 
+plot_3d_vectors(param, vectors)
 
 # Define mutable structs for alignments
 aligns_polar = Array{ParamVar.Alignment_Polar}(undef, param.num_vectors)
