@@ -12,6 +12,8 @@ module ParamVar
     struct Parameters
         x_lim::Float64  # Boundary of cubic region [-x_lim, x_lim]³
         num_vectors::Int64  # Number of vectors
+        flow_swirling::Bool  # true: vectors swirling in xy plane. false: uniformly random vectors
+        file_postfix::String
     end
 
     """
@@ -233,8 +235,10 @@ module PlotFigures
         # Vector plot
         quiver_coef = 0.2
         ax.quiver(x,y,z, quiver_coef*vx, quiver_coef*vy, quiver_coef*vz)
-
-        savefig("./tmp/vectors.png", bbox_inches="tight", pad_inches=0.1)
+        savefig(
+            string("./tmp/vectors", param.file_postfix),
+            bbox_inches="tight", pad_inches=0.1
+        )
     end
 
     """
@@ -292,7 +296,10 @@ module PlotFigures
         joint_plot.ax_marg_x.set_axis_off()
         joint_plot.ax_marg_y.set_axis_off()
 
-        savefig(string("./tmp/", file_prefix[1], "_", file_prefix[2], ".png"), bbox_inches="tight", pad_inches=0.1)
+        savefig(
+            string("./tmp/", file_prefix[1], "_", file_prefix[2], param.file_postfix),
+            bbox_inches="tight", pad_inches=0.1
+        )
     end
 end
 
@@ -328,8 +335,14 @@ using .PlotFigures:
 # ----------------------------------------
 x_lim = 1.0
 num_vectors = 100
+flag_siwrling = true
+if flag_siwrling
+    file_postfix = "_swirling.png"
+else
+    file_postfix = "_random.png"
+end
 param = ParamVar.Parameters(
-    x_lim, num_vectors
+    x_lim, num_vectors, flag_siwrling, file_postfix
 )
 
 
@@ -349,8 +362,11 @@ distribute_points(param, vectors)
 # ----------------------------------------
 ## Define vectors in uniform random direction
 # ----------------------------------------
-# distribute_random_angles(param, vectors)
-distribute_swirling_angles(param, vectors)
+if flag_siwrling
+    distribute_swirling_angles(param, vectors)
+else
+    distribute_random_angles(param, vectors)
+end
 
 plot_3d_vectors(param, vectors)
 
