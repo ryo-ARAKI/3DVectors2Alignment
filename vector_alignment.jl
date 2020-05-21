@@ -24,6 +24,8 @@ module ParamVar
         vx::Float64  # Component in x direction
         vy::Float64
         vz::Float64
+        # Constructor
+        Vector() = new()
     end
 
     """
@@ -33,6 +35,8 @@ module ParamVar
         cos_θ::Float64
         ϕ::Float64
         cos_ϕ::Float64
+        # Constructor
+        Alignment_Polar() = new()
     end
 end
 
@@ -95,13 +99,16 @@ using .ComputeAlignments:
 ## Declare parameters & mutable structs
 # ----------------------------------------
 x_lim = 1.0
-num_vectors = 100
+num_vectors = 10
 param = ParamVar.Parameters(
     x_lim, num_vectors
 )
 
 # Define mutable struct for vectors
 vectors = Array{ParamVar.Vector}(undef, param.num_vectors)
+for itr_vec = 1:param.num_vectors
+    vectors[itr_vec] = ParamVar.Vector()
+end
 
 
 # ----------------------------------------
@@ -118,6 +125,9 @@ distribute_angles(param, vectors)
 
 # Define mutable structs for alignments
 aligns_polar = Array{ParamVar.Alignment_Polar}(undef, param.num_vectors)
+for itr_vec = 1:param.num_vectors
+    aligns_polar[itr_vec] = ParamVar.Alignment_Polar()
+end
 
 # ----------------------------------------
 ## Compute PDF of vector alignment in 3D polar coordinates
