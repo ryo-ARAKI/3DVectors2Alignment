@@ -234,6 +234,12 @@ module PlotFigures
             cmap="plasma",
             clip=clip_range
         )
+        joint_plot = joint_plot.plot_joint(
+            sns.scatterplot,
+            marker="+",
+            color="black",
+            linewidth=2
+        )
 
         # Plot attribution
         if file_prefix[1] == "polar"
