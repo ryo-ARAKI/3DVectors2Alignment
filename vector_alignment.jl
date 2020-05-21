@@ -263,12 +263,12 @@ module PlotFigures
             cmap="plasma",
             clip=clip_range,
             shade=false,
-            color="deepskyblue"
+            color="gold"
         ).plot_joint(
             sns.scatterplot,
             marker="+",
             color="black",
-            linewidth=2
+            linewidth=1
         ))
 
         # Plot attribution
@@ -336,7 +336,7 @@ using .PlotFigures:
 ## Declare parameters & mutable structs
 # ----------------------------------------
 x_lim = 1.0
-num_vectors = 400
+num_vectors = 1000
 flag_siwrling = true
 if flag_siwrling
     file_postfix = "_swirling.png"
