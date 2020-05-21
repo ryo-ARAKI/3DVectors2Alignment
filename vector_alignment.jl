@@ -160,6 +160,33 @@ module PlotFigures
 
         savefig("./tmp/vectors.png", bbox_inches="tight", pad_inches=0.1)
     end
+
+    """
+    Plot PDF of vector alignment in polar/cylindrical coordinate
+    """
+    function plot_alignment(param, dat_x, dat_y, file_prefix)
+        # Figure setting
+        pygui(true)
+        fig = figure()
+        ax = gca(
+            ylim=[-1.0, 1.0], yticks=[-1.0, -0.5, 0.0, 0.5, 1.0]
+        )
+        if file_prefix == "polar_phi_costheta"
+            ax.set_xlabel(L"$\phi$")
+            ax.set_ylabel(L"$\cos \theta$")
+            ax.set_xlim([0.0, π])
+            ax.set_xticks([0.0, π/4.0, π/2.0, π*3.0/4.0, π])
+            ax.set_xticklabels([L"$0$", L"$\pi/4$", L"$\pi/2$", L"$3\pi/4$", L"$\pi$"])
+        end
+
+        ax.scatter(
+            dat_x, dat_y,
+            c="deeppink",
+            alpha=0.8
+        )
+
+        savefig(string("./tmp/", file_prefix, ".png"), bbox_inches="tight", pad_inches=0.1)
+    end
 end
 
 
@@ -183,7 +210,8 @@ using .DefineVectors:
 using .ComputeAlignments:
     compute_alignment_polar
 using .PlotFigures:
-    plot_3d_vectors
+    plot_3d_vectors,
+    plot_alignment
 
 
 # ----------------------------------------
@@ -223,13 +251,20 @@ end
 
 
 # ----------------------------------------
-## Compute PDF of vector alignment in 3D polar coordinates
+## Compute vector alignment in 3D polar coordinates
+## Output its PDF
 # ----------------------------------------
 compute_alignment_polar(param, vectors, aligns_polar)
+plot_alignment(
+    param,
+    getfield.(aligns_polar, :ϕ),
+    getfield.(aligns_polar, :cosθ),
+    "polar_phi_costheta"
+)
 
 #=
 # ----------------------------------------
-## Compute PDF of vector alignment in 3D cylindrical coordinates
+## Compute vector alignment in 3D cylindrical coordinates
 # ----------------------------------------
 compute_alignment_polar(param, vectors, align_cylindrical)
 =#
